@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      var map;
+      var infoWindow;
+      var blockGroupCoords = [
+        {lat: 41.880492, lng: -87.647322},
+        {lat: 41.876672, lng: -87.647202},
+        {lat: 41.876799, lng: -87.637377},
+        {lat: 41.879335, lng: -87.638085},
+        {lat: 41.879258, lng: -87.644042},
+        {lat: 41.880492, lng: -87.647322},
+        {lat: 41.880492, lng: -87.647322}
+      ];
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 41.877666, lng: -87.635942}, // Chicago, 311 S Wacker
+          zoom: 14,
+          mapTypeId: 'terrain'
+        });
+
+        var censusKmlLayer = new google.maps.KmlLayer({
+          url: 'http://googlemaps.github.io/js-v2-samples/ggeoxml/cta.kml',
+          //url: 'file:///C:/Users/Michael/Desktop/cb_2015_17_bg_500k_new.kml',
+          //url: 'file:///C:/Users/Michael/Desktop/cta.kml',
+          map: map
+        });
+
+        var blockGroup = new google.maps.Polygon({
+          paths: blockGroupCoords,
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35
+        });
+
+        blockGroup.setMap(map);
+
+        blockGroup.addListener('click', showArrays)
+
+        infoWindow = new google.maps.InfoWindow;
+      }
+
+      // This function creates an event listener for a click on the blockGroup
+      // polygon and displays the coordinates of its vertices
+      function showArrays(event) {
+        var vertices = this.getPath();
+
+        var contentString = '<b>Block Group polygon</b><br>' +
+            'Clicked location: <br>' + event.latLng.lat() + ',' + event.latLng.lng() +
+            '<br>';
+
+        // Iterate over the vertices.
+        for (var i =0; i < vertices.getLength(); i++) {
+          var xy = vertices.getAt(i);
+          contentString += '<br>' + 'Coordinate ' + i + ':<br>' + xy.lat() + ',' +
+              xy.lng();
+        }
+
+        // Replace the info window's content and position.
+        infoWindow.setContent(contentString);
+        infoWindow.setPosition(event.latLng);
+
+        infoWindow.open(map);
+      }
+
+      // Sample Directions API call:
+      // https://maps.googleapis.com/maps/api/directions/json?origin=41.879335,%20-87.638085&destination=41.877666,%20-87.635942&key=AIzaSyDxp9wO4lyrFg2eG6TTWvYpOR5BdnqAukI
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDxp9wO4lyrFg2eG6TTWvYpOR5BdnqAukI&callback=initMap"
+    async defer></script>
+  </body>
+</html>
